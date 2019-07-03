@@ -1,4 +1,4 @@
-#PipeFrame Documentation
+# PipeFrame Documentation
 
 PipeFrame is a small library to help you process data (stream or batch) taking advantage of python multiprocessing library.
 
@@ -9,7 +9,8 @@ The first thing you should do is create your pipeline, it should inherited from 
 and include a `steps` class attribute:
 
 ```
-class YourCustomPipeline(PipelineEngine):``
+from pipeframe.core import PipelineEngine
+class YourCustomPipeline(PipelineEngine):
     steps = [func1, func2, ...]
 ```
 
@@ -35,6 +36,7 @@ def func2(record):
 To execute your newly created pipeline you must call it using PipeFrame:
 
 ```
+from pipeframe.core import PipeFrame
 pipe_frame = PipeFrame(cpu_count=16, stream_buffer_size=50000)
 pipe_frame.run(YourCustomPipeline)
 ```
