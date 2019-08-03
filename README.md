@@ -48,12 +48,7 @@ The `cpu_count` and `stream_buffer_size` are optional arguments:
  
 If you have multiple pipelines you can also run them in series:
 
-```
+```python3
 pipe_frame = PipeFrame()
 pipe_frame.run(Pipeline01).run(Pipeline02)
 ```
-
-
-  
-
-me
