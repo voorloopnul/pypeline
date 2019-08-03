@@ -8,7 +8,7 @@ PipeFrame is a small library to help you process data (stream or batch) taking a
 The first thing you should do is create your pipeline, it should inherited from `pipeframe.core.PipelineEngine`
 and include a `steps` class attribute:
 
-```
+```python3
 from pipeframe.core import PipelineEngine
 class YourCustomPipeline(PipelineEngine):
     steps = [func1, func2, ...]
@@ -22,7 +22,7 @@ Your functions should receive as parameter the record to be processed and return
 the modified record and a boolean that is used to bypass further steps execution
 on the data (False) or keep going with the pipeline flow (True).
 
-```
+```python3
 def func1(record):
     if record.is_upper():
         return record, False
@@ -35,7 +35,7 @@ def func2(record):
 
 To execute your newly created pipeline you must call it using PipeFrame:
 
-```
+```python3
 from pipeframe.core import PipeFrame
 pipe_frame = PipeFrame(cpu_count=16, stream_buffer_size=50000)
 pipe_frame.run(YourCustomPipeline)
