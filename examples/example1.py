@@ -67,4 +67,3 @@ class RedditDataPipeline(PipelineEngine):
 
 pipe_frame = PipeFrame(_cpu_count=8, stream_buffer_size=50000)
 pipe_frame.run(RedditDataPipeline)
-
