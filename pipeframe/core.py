@@ -6,6 +6,7 @@ from queue import Empty
 class PipelineEngine(Process):
     steps = []
     timeout = 2
+    source = 'batch'
 
     def __init__(self, name, stream, output):
         super(PipelineEngine, self).__init__()
@@ -44,7 +45,7 @@ class PipeFrame(object):
         start_time = time.time()
         load_function = load if load else _pipeline.feed
 
-        if _pipeline.load == 'batch':
+        if _pipeline.source == 'batch':
             load_function(self.stream)
 
         worker_list = []
@@ -54,7 +55,7 @@ class PipeFrame(object):
 
         [worker.start() for worker in worker_list]
 
-        if _pipeline.load == 'stream':
+        if _pipeline.source == 'stream':
             load_function(self.stream)
 
         print("Waiting to join...")
