@@ -64,5 +64,3 @@ class PipeFrame(object):
         self.stream.cancel_join_thread()
         end_time = time.time()
         print("Elapsed time: {0}s".format(round(end_time-start_time, 2)))
-
-        return self
