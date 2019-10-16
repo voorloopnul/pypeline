@@ -10,6 +10,7 @@ Pipeframe in available at pip, to install it in your environment just do:
 
 ## Getting started
 
+### Create your pipeline
 The first thing you should do is create your pipeline, it should inherited from `pipeframe.core.PipelineEngine`
 and include a `steps` class attribute:
 
@@ -23,7 +24,7 @@ The pipeline will execute each entry against the `steps` functions. You can
 define any amount of functions to perform on your data, the execution order
 will follow the same order you defined in the steps list.
 
-Your functions should receive as parameter the record to be processed and return
+Your function should receive as parameter the record to be processed and return
 the modified record and a boolean that is used to bypass further steps execution
 on the data (False) or keep going with the pipeline flow (True).
 
@@ -35,7 +36,7 @@ def func1(record):
         return record.lower(), True 
 ```
 
-You also have to provide a function named `feed that will feed your process with some data:
+You also have to provide a function named `feed` that will feed your process with some data:
 
 ```python3
 class YourCustomPipeline(PipelineEngine):
@@ -49,7 +50,7 @@ class YourCustomPipeline(PipelineEngine):
                 bucket.put(entry['data'])
 ```
 
-
+### Run your pipeline
 
 To execute your newly created pipeline you must call it using PipeFrame executor:
 
@@ -66,13 +67,14 @@ The `cpu_count` and `buffer_size` are optional arguments:
  
  ## Stream or Batch?
  
- By default your pipeline will run in batch mode, it**** means that **your feed function will run and complete before the step
- functions start**. You have to be aware of how much data entries are going to the queue and tune the stream_buffer_size according
- to that.
+ By default your pipeline will run in batch mode, it means that **your feed function will run and complete before the step
+ functions start**. You have to be aware of how much data entries are going to the queue and tune the _buffer_size_ 
+ according to that.
  
- If you make source='stream' **your feed function will start after the step functions and the feeding and processing
+ If you make _source='stream'_ **your feed function will start after the step functions and the feeding and processing
  will happen in parallel**. In that case you should tune the timeout attribute for a value high enough to prevent the
- pipeline termination due absence of data in the queue. 
+ pipeline termination due temporary absence of data in the queue ( For the cases that you data ingestion is slower than 
+ your capacity to process it). 
  
  Example:
  
@@ -86,3 +88,6 @@ class YourCustomPipeline(PipelineEngine):
         for entry in infinite_stream_of_data():
             bucket.put(entry)
 ```
+
+In the example above your workers will wait up to 10 seconds for the the infinite_stream_of_data() function to produce 
+new data to be processed, if no new data arrive in 10 seconds, the workers will terminated because your stream has dried.

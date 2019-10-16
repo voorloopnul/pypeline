@@ -15,6 +15,7 @@ class PipelineEngine(Process):
         self.output_queue = output_queue
 
     def run(self):
+        print("Starting worker {0}".format(self.name))
         count = 0
         while True:
             try:
@@ -36,8 +37,8 @@ class PipelineEngine(Process):
 
 class PipeFrame(object):
 
-    def __init__(self, cpu_count=_cpu_count()-1, stream_buffer_size=1000):
-        self.input_queue = Queue(stream_buffer_size)
+    def __init__(self, cpu_count=_cpu_count()-1, buffer_size=10000):
+        self.input_queue = Queue(buffer_size)
         self.output_queue = Queue()
         self.cpu_count = cpu_count
 
@@ -50,7 +51,7 @@ class PipeFrame(object):
 
         worker_list = []
         for i in range(self.cpu_count):
-            worker = _pipeline(name="worker-{0}".format(i), stream=self.input_queue, output=self.output_queue)
+            worker = _pipeline(name="worker-{0}".format(i), input_queue=self.input_queue, output_queue=self.output_queue)
             worker_list.append(worker)
 
         [worker.start() for worker in worker_list]
@@ -58,7 +59,6 @@ class PipeFrame(object):
         if _pipeline.source == 'stream':
             load_function(self.input_queue)
 
-        print("Waiting to join...")
         [worker.join() for worker in worker_list]
 
         print("Done!")

@@ -1,69 +1,48 @@
 from pipeframe.core import PipelineEngine, PipeFrame
-from io import BytesIO
-from PIL import Image
-import requests
 import fcntl
 import json
 
 
 def clear_entry(entry):
-    new_entry = {
-        'title': entry['title'],
-        'subreddit': entry['subreddit'],
-        'thumbnail': entry['thumbnail']
-     }
-    return new_entry, True
+    entry['new_number'] = 0
+    return entry, True
 
 
-def get_colors(entry):
-    if entry['thumbnail'].startswith('http'):
-        r = requests.get(entry['thumbnail'])
-        if r.status_code == 200:
-            img = Image.open(BytesIO(r.content))
-            w, h = img.size
-            pixels = img.getcolors(w * h)
-            entry['colors'] = pixels
-            return entry, True
-    return entry, False
-
-
-def get_predominant_color(entry):
-    biggest = (0, ())
-    for pixel in entry['colors']:
-        if pixel[0] > biggest[0]:
-            biggest = pixel
-    entry['predominant_color'] = biggest
+def power(entry):
+    entry['new_number'] = entry['number'] ** entry['number']
     return entry, True
 
 
 def write_to_disk(entry):
     """
-    Clear the entry, lock the file, write entry, unlock the file.
+    Lock the file, write entry, release the file.
     """
-    del entry['colors']
-    del entry['title']
-    del entry['thumbnail']
-
     with open("log", "a") as fh:
         fcntl.flock(fh, fcntl.LOCK_EX)
-        fh.write(json.dumps(entry)+'\n')
+        fh.write(json.dumps(entry['number'])+'\n')
         fcntl.flock(fh, fcntl.LOCK_UN)
 
     return entry, True
 
 
 class RedditDataPipeline(PipelineEngine):
-    steps = [clear_entry, get_colors, get_predominant_color, write_to_disk]
-    load = 'stream'
+    steps = [clear_entry, power, write_to_disk]
+    source = 'batch'
 
     @staticmethod
     def feed(bucket):
-        req = requests.get('https://www.reddit.com/r/all/top.json', headers={'User-agent': 'pipeframe'})
-        if req.status_code == 200:
-            data = req.json()['data']['children']
-            for entry in data:
-                bucket.put(entry['data'])
+        x = 1000000
+        for i in range(10):
+            x += 1000
+            entry = {'number': x}
+            bucket.put(entry)
 
 
-pipe_frame = PipeFrame(_cpu_count=8, stream_buffer_size=50000)
+# With all cpu  - 1
+pipe_frame = PipeFrame()
+pipe_frame.run(RedditDataPipeline)
+
+
+# With 2 cpus
+pipe_frame = PipeFrame(cpu_count=2)
 pipe_frame.run(RedditDataPipeline)
