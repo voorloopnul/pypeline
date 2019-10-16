@@ -25,7 +25,8 @@ def write_to_disk(entry):
     return entry, True
 
 
-class RedditDataPipeline(PipelineEngine):
+
+class PowerDataPipeline(PipelineEngine):
     steps = [clear_entry, power, write_to_disk]
     source = 'batch'
 
@@ -40,9 +41,8 @@ class RedditDataPipeline(PipelineEngine):
 
 # With all cpu  - 1
 pipe_frame = PipeFrame()
-pipe_frame.run(RedditDataPipeline)
-
+pipe_frame.run(PowerDataPipeline)
 
 # With 2 cpus
 pipe_frame = PipeFrame(cpu_count=2)
-pipe_frame.run(RedditDataPipeline)
+pipe_frame.run(PowerDataPipeline)

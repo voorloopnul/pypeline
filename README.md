@@ -1,10 +1,15 @@
-# PipeFrame Documentation
+# PipeFrame
+What is a Pipeline? 
 
-PipeFrame is a small library that help you process data (stream or batch) taking advantage of python multiprocessing library.
+> In computing, a pipeline, also known as a data pipeline, is a set of data processing elements connected in series, where the output of one element is the input of the next one. The elements of a pipeline are often executed in parallel or in time-sliced fashion. Some amount of buffer storage is often inserted between elements.
+
+_source: Wikipedia_
+
+PipeFrame is a small **pipe**line **frame**work that help you process data (stream or batch) taking advantage of python multiprocessing library.
 
 ## Installation
 
-Pipeframe in available at pip, to install it in your environment just do:
+The package in available at pip, to install it in your environment just do:
 
  > pip install pipeframe
 
@@ -91,3 +96,56 @@ class YourCustomPipeline(PipelineEngine):
 
 In the example above your workers will wait up to 10 seconds for the the infinite_stream_of_data() function to produce 
 new data to be processed, if no new data arrive in 10 seconds, the workers will terminated because your stream has dried.
+
+## Full example
+
+```python 
+from pipeframe.core import PipelineEngine, PipeFrame
+import fcntl
+import json
+
+
+def clear_entry(entry):
+    entry['new_number'] = 0
+    return entry, True
+
+
+def power(entry):
+    entry['new_number'] = entry['number'] ** entry['number']
+    return entry, True
+
+
+def write_to_disk(entry):
+    """
+    Lock the file, write entry, release the file.
+    """
+    with open("log", "a") as fh:
+        fcntl.flock(fh, fcntl.LOCK_EX)
+        fh.write(json.dumps(entry['number'])+'\n')
+        fcntl.flock(fh, fcntl.LOCK_UN)
+
+    return entry, True
+
+
+class PowerDataPipeline(PipelineEngine):
+    steps = [clear_entry, power, write_to_disk]
+    source = 'batch'
+
+    @staticmethod
+    def feed(bucket):
+        x = 1000000
+        for i in range(10):
+            x += 1000
+            entry = {'number': x}
+            bucket.put(entry)
+
+
+# With all cpu  - 1
+pipe_frame = PipeFrame()
+pipe_frame.run(PowerDataPipeline)
+
+
+# With 2 cpus
+pipe_frame = PipeFrame(cpu_count=2)
+pipe_frame.run(PowerDataPipeline)
+```
