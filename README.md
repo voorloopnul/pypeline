@@ -1,6 +1,6 @@
 # PipeFrame Documentation
 
-PipeFrame is a small library to help you process data (stream or batch) taking advantage of python multiprocessing library.
+PipeFrame is a small library that help you process data (stream or batch) taking advantage of python multiprocessing library.
 
 ## Installation
 
@@ -35,7 +35,7 @@ def func1(record):
         return record.lower(), True 
 ```
 
-You also have to provide a function `feed´ to feed your process with some data:
+You also have to provide a function named `feed that will feed your process with some data:
 
 ```python3
 class YourCustomPipeline(PipelineEngine):
@@ -51,7 +51,7 @@ class YourCustomPipeline(PipelineEngine):
 
 
 
-To execute your newly created pipeline you must call it using PipeFrame:
+To execute your newly created pipeline you must call it using PipeFrame executor:
 
 ```python3
 from pipeframe.core import PipeFrame
@@ -59,19 +59,19 @@ pipe_frame = PipeFrame(cpu_count=16, stream_buffer_size=50000)
 pipe_frame.run(YourCustomPipeline)
 ```
 
-The `cpu_count` and `stream_buffer_size` are optional arguments:
+The `cpu_count` and `buffer_size` are optional arguments:
 
- - cpu_count: an integer that defaults to the number o cores in your machine minus 1
- - stream_buffer_size: an integer that defaults to 1000
+ - cpu_count: an integer that defaults to the number of cores in your machine minus 1
+ - buffer_size: an integer that defaults to 10000 
  
  ## Stream or Batch?
  
- By default your pipeline will run in batch mode, it means that your feed function will run and complete before the step
- functions start. You have to be aware of how much data entries are going to the queue and tune the stream_buffer_size according
+ By default your pipeline will run in batch mode, it**** means that **your feed function will run and complete before the step
+ functions start**. You have to be aware of how much data entries are going to the queue and tune the stream_buffer_size according
  to that.
  
- If you make source='stream' your feed function will start after the step functions and the feeding and processing
- will happen in parallel. In that case you should tune the timeout attribute for a value high enough to prevent the
+ If you make source='stream' **your feed function will start after the step functions and the feeding and processing
+ will happen in parallel**. In that case you should tune the timeout attribute for a value high enough to prevent the
  pipeline termination due absence of data in the queue. 
  
  Example:
