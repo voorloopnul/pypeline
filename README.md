@@ -9,7 +9,7 @@ PipeFrame is a small **pipe**line **frame**work that help you process data (stre
 
 ## Installation
 
-The package in available at pip, to install it in your environment just do:
+The package is available at pip, to install it in your environment just type:
 
  > pip install pipeframe
 
