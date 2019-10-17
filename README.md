@@ -61,7 +61,7 @@ To execute your newly created pipeline you must call it using PipeFrame executor
 
 ```python3
 from pipeframe.core import PipeFrame
-pipe_frame = PipeFrame(cpu_count=16, stream_buffer_size=50000)
+pipe_frame = PipeFrame(cpu_count=16, buffer_size=50000)
 pipe_frame.run(YourCustomPipeline)
 ```
 
