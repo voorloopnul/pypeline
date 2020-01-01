@@ -1,11 +1,11 @@
-# PipeFrame
+# Pypeline
 What is a Pipeline? 
 
 > In computing, a pipeline, also known as a data pipeline, is a set of data processing elements connected in series, where the output of one element is the input of the next one. The elements of a pipeline are often executed in parallel or in time-sliced fashion. Some amount of buffer storage is often inserted between elements.
 
 _source: Wikipedia_
 
-PipeFrame is a small **pipe**line **frame**work that help you process data (stream or batch) taking advantage of python multiprocessing library.
+Pypeline is a small library that help you process data (stream or batch) taking advantage of python multiprocessing library.
 
 ## Installation
 
